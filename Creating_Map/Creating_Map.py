@@ -19,17 +19,17 @@ counties = gpd.read_file('Data_Files/Localities2020boundaries/Localities2020boun
 strandings = pd.read_csv('Data_Files/Strandings_SMASS _data1992_2021_utf8.txt') #importing strandings for conversion
 
 #convert mammal strandings database into points shapefile
-strandings['geometry'] = list(zip(strandings['LongOSGB36'], strandings['LatOSGB36']))
+strandings['geometry'] = list(zip(strandings['LongWGS84'], strandings['LatWGS84']))
 strandings['geometry'] = strandings['geometry'].apply(Point)
 strandingsgdf: GeoDataFrame = gpd.GeoDataFrame(strandings)
 strandingsgdf.set_geometry('geometry')
-strandingsgdf.set_crs("EPSG:4277", inplace=True) #sets the coordinate reference system to epsg:3857 WGS84 lat/lon
+strandingsgdf.set_crs("EPSG:4326", inplace=True) #sets the coordinate reference system to epsg:3857 WGS84 lat/lon
 strandingsgdf.to_file('marinestrandings.shp')
 
 
 #load the new strandings shapefile
 marinestrandings = gpd.read_file('marinestrandings.shp')
-marinestrandings.to_crs("OSGB 1936 / British National Grid")
+marinestrandings = marinestrandings.to_crs("EPSG:27700")
 
 #creating the map
 myFig = plt.figure(figsize=(10, 10))  # create a figure of size 15x15 (representing the page size in inches)
@@ -47,9 +47,13 @@ counties_feat = ShapelyFeature(counties['geometry'], myCRS, edgecolor='mediumblu
 ax.add_feature(counties_feat)
 
 #adding strandings
-#strandings_feat = ShapelyFeature(marinestrandings['geometry'], myCRS, edgecolor='coral', facecolor='coral', linewidth=3)
-#ax.add_feature(strandings_feat)
-plt.scatter()
+strandings_plot = ax.plot(marinestrandings.geometry.x, marinestrandings.geometry.y, transform=myCRS, color='coral', marker = 'o', markersize = 4)
+
+
+#ax.plot(marinestrandings['LongWGS84'], marinestrandings['LatWGS84'], transform=myCRS, color='coral', marker = 'o', markersize=20)
+print(marinestrandings.crs)
+#ax.add_feature(strandings_plot)
+
 
 
 
