@@ -13,10 +13,30 @@ from shapely.geometry import MultiPoint
 
 #load the data
 outline = gpd.read_file('Data_Files/Scotland_boundary/Scotland boundary.shp') #outline of Scotland
-background = rst.open('Data_Files/Over_gb/GBOverview.tif') #background Ordnance Survey map
-counties = gpd.read_file('Data_Files/Localities2020boundaries/Localities2020boundaries/Localities2020_MHW.shp') #gov
+#background = rst.open('Data_Files/Over_gb/GBOverview.tif') #background Ordnance Survey map
 #scot data
 strandings = pd.read_csv('Data_Files/Strandings_SMASS _data1992_2021_utf8.txt') #importing strandings for conversion
+
+#adding fishing vessels
+
+with rst.open('Data_Files/National Maps/National Maps/Rasters/ScotMap_Central_numberVessel_aggr_3_190713/ScotMap_Central_numberVessel_aggr_3_190713.tif')\
+        as dataset:
+    xmin, ymin, xmax, ymax = dataset.bounds
+    crs = dataset.crs
+    landcover = dataset.read(1)
+    affine_tfm = dataset.transform
+
+print('{} opened in {} mode'.format(dataset.name,dataset.mode))
+print('image has {} band(s)'.format(dataset.count))
+print('image size (width, height): {} x {}'.format(dataset.width, dataset.height))
+print('band 1 dataype is {}'.format(dataset.dtypes[0])) # note that the band name (Band 1) differs from the list index [0]
+#fishingvessels = fishingvessels.to_crs("EPSG:27700")
+#print(fishingvessels.crs)
+#mappedvessels = fishingvessels.read()
+
+#adding fishing restrictions
+#no_fishing = gpd.read_file('Data_Files/area_management_fishing_restrictions/area_management_fishing_restrictionsPolygon.shp')
+#no_fishing = no_fishing.to_crs("EPSG:27700")
 
 #convert mammal strandings database into points shapefile
 strandings['geometry'] = list(zip(strandings['LongWGS84'], strandings['LatWGS84']))
@@ -43,16 +63,21 @@ xmin, ymin, xmax, ymax = outline.total_bounds
 ax.add_feature(outline_feature) # add the features we've created to the map.
 
 #adding counties
-counties_feat = ShapelyFeature(counties['geometry'], myCRS, edgecolor='mediumblue', facecolor='mediumblue', linewidth=1)
-ax.add_feature(counties_feat)
+#counties_feat = ShapelyFeature(counties['geometry'], myCRS, edgecolor='mediumblue', facecolor='mediumblue', linewidth=1)
+#ax.add_feature(counties_feat)
+
+#Adding no fishing zones
+no_fishing_feature = ShapelyFeature(no_fishing['geometry'], myCRS, edgecolor='mediumblue', facecolor='mediumblue', linewidth=2)
+ax.add_feature(no_fishing_feature)
 
 #adding strandings
-strandings_plot = ax.plot(marinestrandings.geometry.x, marinestrandings.geometry.y, transform=myCRS, color='coral', marker = 'o', markersize = 4)
+strandings_plot = ax.plot(marinestrandings.geometry.x, marinestrandings.geometry.y, transform=myCRS, color='coral',
+                          marker = 'o', markersize = 1, linestyle = '')
 
+#adding fishing vessel info
+#ax.imshow(mappedvessels, transform=myCRS, extent=[xmin, xmax, ymin, ymax])
 
-#ax.plot(marinestrandings['LongWGS84'], marinestrandings['LatWGS84'], transform=myCRS, color='coral', marker = 'o', markersize=20)
 print(marinestrandings.crs)
-#ax.add_feature(strandings_plot)
 
 
 
