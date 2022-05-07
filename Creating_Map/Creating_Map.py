@@ -7,16 +7,9 @@ import matplotlib.pyplot as plt
 import numpy as np
 from cartopy.feature import ShapelyFeature
 import matplotlib.patches as mpatches
-import rasterio as rst
-from rasterio.crs import CRS
-from rasterio.plot import show
-from rasterio.plot import show_hist
-from rasterio.mask import mask
-from shapely.geometry import box
 import pandas as pd
 from geopandas import GeoDataFrame
 from shapely.geometry import Point
-import rioxarray
 from shapely.geometry import MultiPoint
 
 #load the data
@@ -41,67 +34,67 @@ marinestrandings = gpd.read_file('marinestrandings.shp')
 marinestrandings = marinestrandings.to_crs("EPSG:27700") #converting the CRS
 
 #creating the map
-myFig = plt.figure(figsize=(10, 10))  # create a figure of size 15x15 (representing the page size in inches)
-myCRS = ccrs.UTM(30)  # create a reference system to transform our data.
-ax = plt.axes(projection=ccrs.Mercator())   #create an axes object in the figure, using a Mercator projection
+#myFig = plt.figure(figsize=(10, 10))  # create a figure of size 15x15 (representing the page size in inches)
+#myCRS = ccrs.UTM(30)  # create a reference system to transform our data.
+#ax = plt.axes(projection=ccrs.Mercator())   #create an axes object in the figure, using a Mercator projection
 
 #add the outline of Scotland using cartopy's ShapelyFeature
-outline_feature = ShapelyFeature(outline['geometry'], myCRS, edgecolor='palegoldenrod', facecolor='palegoldenrod')
-ax.add_feature(outline_feature)
-outline = outline.to_crs("EPSG:27700")
-xmin, ymin, xmax, ymax = outline.total_bounds
+#outline_feature = ShapelyFeature(outline['geometry'], myCRS, edgecolor='palegoldenrod', facecolor='palegoldenrod')
+#ax.add_feature(outline_feature)
+#outline = outline.to_crs("EPSG:27700")
+#xmin, ymin, xmax, ymax = outline.total_bounds
 
 #adding settlements
-settlements_plot = ax.plot(settlements.geometry.x, settlements.geometry.y, transform=myCRS, color='lightslategray',
-                           marker='o', markersize = 1.1, linestyle = '' )
+#settlements_plot = ax.plot(settlements.geometry.x, settlements.geometry.y, transform=myCRS, color='lightslategray',
+ #                          marker='o', markersize = 1.1, linestyle = '' )
 
 #adding counties
-counties_feature = ShapelyFeature(counties['geometry'], myCRS, edgecolor='black', facecolor='lightcyan', linewidth=0.5)
-ax.add_feature(counties_feature)
+#counties_feature = ShapelyFeature(counties['geometry'], myCRS, edgecolor='black', facecolor='lightcyan', linewidth=0.5)
+#ax.add_feature(counties_feature)
 
 #adding waterways
-waterways_feat = ShapelyFeature(waterways['geometry'], myCRS, edgecolor='dodgerblue', linewidth=0.2)
-ax.add_feature(waterways_feat)
+#waterways_feat = ShapelyFeature(waterways['geometry'], myCRS, edgecolor='dodgerblue', linewidth=0.2)
+#ax.add_feature(waterways_feat)
 
 #adding beach substrate map
 
 # get the number of unique soil types in the dataset
-num_substrate = len(beach_substrate.FORE_DESC.unique())
-print('Number of unique features: {}'.format(num_substrate)) #
-substrate_colours = ["gold", "coral", "bisque", "tan", "lightyellow", "moccasin", "sandybrown", "navajowhite", "orange",
-                "blanchedalmond", "orangered", "peachpuff", "darksalmon"] #selecting colours for substrate types
+#num_substrate = len(beach_substrate.FORE_DESC.unique())
+#print('Number of unique features: {}'.format(num_substrate)) #
+#substrate_colours = ["gold", "coral", "bisque", "tan", "lightyellow", "moccasin", "sandybrown", "navajowhite", "orange",
+#                "blanchedalmond", "orangered", "peachpuff", "darksalmon"] #selecting colours for substrate types
 # get a list of unique names for the substrate types
 substrate_names = list(beach_substrate.FORE_DESC.unique())
 
 # next, add the substrate types to the map using the colors picked.
-for i, name in enumerate(substrate_names):
-    feat = ShapelyFeature(beach_substrate['geometry'][beach_substrate['FORE_DESC'] == name], myCRS,
-                          edgecolor=substrate_colours[i],
-                          facecolor=substrate_colours[i],
-                          linewidth=4,
-                          alpha=0.25)
-    ax.add_feature(feat)
+#for i, name in enumerate(substrate_names):
+#    feat = ShapelyFeature(beach_substrate['geometry'][beach_substrate['FORE_DESC'] == name], myCRS,
+#                          edgecolor=substrate_colours[i],
+#                          facecolor=substrate_colours[i],
+#                          linewidth=4,
+#                          alpha=0.25)
+#    ax.add_feature(feat)
 
 #adding strandings
-num_mammal = len(marinestrandings.Class.unique()) # getting number of mammal types
-print('Number of unique mammals: {}'.format(num_mammal))
-mammal_colours = (["salmon", "cornflowerblue", "coral", "thistle", "forestgreen", "mediumslateblue", "darkturquoise",
-                  "palegoldenrod", "violet", "olive", "seagreen", "indianred", "plum", "darkgrey", "c", "lemonchiffon"])
+#num_mammal = len(marinestrandings.Class.unique()) # getting number of mammal types
+#print('Number of unique mammals: {}'.format(num_mammal))
+#mammal_colours = (["salmon", "cornflowerblue", "coral", "thistle", "forestgreen", "mediumslateblue", "darkturquoise",
+#                  "palegoldenrod", "violet", "olive", "seagreen", "indianred", "plum", "darkgrey", "c", "lemonchiffon"])
 #mammal_colours = (["xkcd:sky blue", "xkcd:grey", "xkcd:sky blue", "xkcd:grey", "xkcd:sky blue", "xkcd:grey",
 #                   "xkcd:sky blue", "xkcd:grey", "xkcd:sky blue", "xkcd:grey", "xkcd:sky blue", "xkcd:grey",
 #                   "xkcd:sky blue", "xkcd:grey", "xkcd:sky blue", "xkcd:grey"])
 
-mammal_names = list(marinestrandings.SubClass.unique()) #creating list of mammal names
-print(mammal_names)
+#mammal_names = list(marinestrandings.SubClass.unique()) #creating list of mammal names
+#print(mammal_names)
 
-for i, name in enumerate(mammal_names, start=0):
-    strandings_plot = ax.plot(marinestrandings.geometry.x, marinestrandings.geometry.y,
-                              [marinestrandings['SubClass'] == name],
-                              transform=myCRS, c=mammal_colours[i],
-                              marker = 'o', markersize = 1.5, linestyle = '')
+#for i, name in enumerate(mammal_names, start=0):
+#    strandings_plot = ax.plot(marinestrandings.geometry.x, marinestrandings.geometry.y,
+#                              [marinestrandings['SubClass'] == name],
+#                              transform=myCRS, c=mammal_colours[i],
+#                              marker = 'o', markersize = 1.5, linestyle = '')
 
 
-ax.stock_img #adding background to map
+#ax.stock_img #adding background to map
 
 #mammal_colours = {"Grey seal":"salmon", "Harbour seal":"cornflowerblue", "Pelagic delphinid":"coral",
 #                  "Marine turtle":"thistle", "Harbour porpoise":"forestgreen", "Cetacean (indeterminate species)":"mediumslateblue",
@@ -114,30 +107,108 @@ ax.stock_img #adding background to map
 
 #Create map legend
 # generate matplotlib handles to create a legend of the features we put in our map.
-def generate_handles(labels, colors, edge='k', alpha=1):
-    lc = len(colors)  # get the length of the color list
-    handles = []
-    for i in range(len(labels)):
-        handles.append(mpatches.Rectangle((0, 0), 1, 1, facecolor=colors[i % lc], edgecolor=edge, alpha=alpha))
-    return handles
+#def generate_handles(labels, colors, edge='k', alpha=1):
+#    lc = len(colors)  # get the length of the color list
+#    handles = []
+#    for i in range(len(labels)):
+#        handles.append(mpatches.Rectangle((0, 0), 1, 1, facecolor=colors[i % lc], edgecolor=edge, alpha=alpha))
+#    return handles
 
-mammalnames = [name.title() for name in mammal_names]
+#mammalnames = [name.title() for name in mammal_names]
 
-mammal_handles = generate_handles(marinestrandings.SubClass.unique(), mammal_colours, alpha=0.25)
-water_handle = generate_handles(['Waterways'], ['dodgerblue'])
+#mammal_handles = generate_handles(marinestrandings.SubClass.unique(), mammal_colours, alpha=0.25)
+#water_handle = generate_handles(['Waterways'], ['dodgerblue'])
 
-handles = mammal_handles + water_handle
-labels = mammalnames + ['Waterways']
+#handles = mammal_handles + water_handle
+#labels = mammalnames + ['Waterways']
 
-leg = ax.legend(handles, labels, title='Legend', title_fontsize=7.5,
-                 fontsize=6, loc='upper left', frameon=True, framealpha=1)
+#leg = ax.legend(handles, labels, title='Legend', title_fontsize=7.5,
+#                 fontsize=6, loc='upper left', frameon=True, framealpha=1)
 
 
 # using the boundary of the shapefile features (Scotnad outline), zoom the map to Scotland
-ax.set_extent([xmin, xmax, ymin, ymax], crs=myCRS)
+#ax.set_extent([xmin, xmax, ymin, ymax], crs=myCRS)
 
-myFig.savefig('map.png', bbox_inches='tight', dpi=300)
+#myFig.savefig('map.png', bbox_inches='tight', dpi=300)
+#plt.show()
+
+
+#""""PART 2 OF CODE: ANALYSIS OF STRANDINGS DATA"""
+
+#First, we are counting how many of each marine mammal was found stranded in Scotland between 1980 and 2022, ordered by count
+#print(marinestrandings.groupby('SubClass').size().sort_values)
+print(marinestrandings['SubClass'].value_counts())
+
+#Next we will try to identify any relationships between mammal strandings and beach substrate
+#Completing a spatial join
+print(beach_substrate.crs) # checking if CRS is correct (should be EPSG:27700)
+beach_substrate = beach_substrate.set_crs("EPSG:27700")
+print(beach_substrate.crs)
+
+mammalsubstratejoin = gpd.sjoin(marinestrandings, beach_substrate, how='inner', lsuffix='left', rsuffix='right') # perform the spatial join
+#Note that as sum marine mammals were not found on beaches (floating at sea, etc.) the total number of strandings will
+#decrease once join is completed.
+print(mammalsubstratejoin.columns.values) # show the joined table column headers
+#We will delete a few of those colums as there are many we dont need
+del mammalsubstratejoin["NatRef"], mammalsubstratejoin["M ref"], mammalsubstratejoin["LocalAuth"], mammalsubstratejoin["Easting"], mammalsubstratejoin["Northing"]
+
+mammalsubstrategrouped = mammalsubstratejoin.groupby(['SubClass', 'FORE_DESC'])['SubClass'].size().to_frame('size') # summarize the strandings by beach substrate
+#added size as new column 'size' for use in bar chart
+
+mammalsubstrategrouped.reset_index(inplace=True)
+mammalsubstrategrouped.info(verbose=True)
+mammalsubstrategrouped['SubClass'] = mammalsubstrategrouped['SubClass'].str.capitalize()
+
+
+mammalsubstratejoin.to_file('mammalsubstrate.shp')
+mammalsubstrategrouped.to_csv('mammalsubstrategrouped.csv')
+print(mammalsubstrategrouped)
+
+
+newdf = mammalsubstrategrouped.reset_index().groupby(['SubClass', 'FORE_DESC'])['size'].aggregate('first').unstack()
+newdf.to_csv('newdf.csv')
+
+#print(dftest.head)
+#print(newdf.head())
+#newdf.to_file('newdf.shp')
+
+
+newdf.reset_index(inplace=True)
+newdf.info(verbose=True)
+newdf['SubClass'] = newdf['SubClass'].str.capitalize()
+#the marine turtle and delphid rows got split into two so i will drop the
+print(newdf.dtypes)
+newdf = newdf.sort_values('SubClass')
+#df_sorted = df.sort_values('marks')
+
+
+ax = newdf.plot.bar(x='SubClass', stacked=True, color=["indianred", "coral", "gold", "olive", "forestgreen",
+                                                       "mediumturquoise",
+                                                       "lightskyblue", "royalblue", "darkslateblue",
+                                                       "mediumpurple", "violet", "tab:pink", "tab:brown"], width=0.2,
+                    figsize=(15,8))
+ax.set_title('Stranding Substrates', fontsize=20)
+ax.set_ylim(0,2100)
+ax.set_xticklabels(['Basking shark','Bottlenose dolphin','Cetacean', 'Grey seal', 'Harbour porpoise',
+                    'Harbour seal', 'Kogia', 'Marine turtle', 'Mysticete', 'Pelagac Delphinid',
+                    'Pinniped', 'Pinniped indeterminate', 'Shark', 'Sperm/beaked whale'], rotation=0, fontsize=8)
+plt.legend(['Boulders/Loose Rock', 'Gravel', 'Made Ground (Man Made)', 'Mud', 'Mud and Gravel', 'Not Present',
+            'Rock Platform', 'Rock platform with banks of gravel', 'Rock platform with boulders/loose rock',
+            'Sand', 'Sand & Gravel', 'Sand & Mud', 'Unspecified'], loc='upper left', ncol = 1, fontsize=8)
+ax.spines['right'].set_visible(False)
+ax.spines['left'].set_visible(False)
+ax.spines['top'].set_visible(False)
+ax.spines['bottom'].set_visible(False)
+# adjust limits and draw grid lines
+ax.set_axisbelow(True)
+ax.yaxis.grid(color='gray', linestyle='dashed')
 plt.show()
 
 
 
+#newdf.plot(x='SubClass', kind='bar', stacked=True,
+ #       title='Stacked Bar Graph by dataframe')
+
+fields = ['SAND','MUD','ROCK PLATFORM','GRAVEL', 'MUD & GRAVEL', 'SAND & GRAVEL', 'ROCK PLATFORM WITH BANKS OF GRAVEL',
+          'ROCK PLATFORM WITH BOULDERS/LOSE ROCK', 'BOULDERS/LOOSE ROCK', 'NOT PRESENT', 'MADE GROUND (MAN MADE)',
+          'SAND & MUD', 'UNSPECIFIED']
