@@ -205,10 +205,53 @@ ax.yaxis.grid(color='gray', linestyle='dashed')
 plt.show()
 
 
+# In order to add more meaning to these results, it is useful to know the percentage area covered by each substrate type
 
-#newdf.plot(x='SubClass', kind='bar', stacked=True,
- #       title='Stacked Bar Graph by dataframe')
+for i, row in beach_substrate.iterrows(): # iterate over each row in the GeoDataFrame
+    beach_substrate.loc[i, 'Area'] = row['geometry'].area # assign the row's geometry length to a new column, Area
 
-fields = ['SAND','MUD','ROCK PLATFORM','GRAVEL', 'MUD & GRAVEL', 'SAND & GRAVEL', 'ROCK PLATFORM WITH BANKS OF GRAVEL',
-          'ROCK PLATFORM WITH BOULDERS/LOSE ROCK', 'BOULDERS/LOOSE ROCK', 'NOT PRESENT', 'MADE GROUND (MAN MADE)',
-          'SAND & MUD', 'UNSPECIFIED']
+print(beach_substrate.head()) # print the updated GeoDataFrame to see the changes
+#beach_substrate.to_csv('newsubstrate.csv')
+
+def substrate_percent(beach):
+    total_beach = beach_substrate['Area'].sum()
+    specify_beach = beach_substrate[beach_substrate['FORE_DESC'] == beach]['Area'].sum()
+    area = (specify_beach / total_beach) * 100
+    print('Total percentage area of ' + beach + ' is {:.2f}'.format(area))
+
+substrate_percent('GRAVEL')
+substrate_percent('SAND')
+substrate_percent('BOULDERS/LOOSE ROCK')
+substrate_percent('MADE GROUND (MAN MADE)')
+substrate_percent('MUD')
+substrate_percent('MUD & GRAVEL')
+substrate_percent('NOT PRESENT')
+substrate_percent('ROCK PLATFORM')
+substrate_percent('ROCK PLATFORM WITH BANKS OF GRAVEL')
+substrate_percent('ROCK PLATFORM WITH BOULDERS /LOSE ROCK')
+substrate_percent('SAND & GRAVEL')
+substrate_percent('SAND & MUD')
+substrate_percent('UNSPECIFIED')
+
+#Finally, we will compare these percentages to percentages from the joined dataframe above
+
+def strandings_percent(beach):
+    total_strandings = mammalsubstrategrouped['size'].sum()
+    per_beach = (newdf[beach].sum() / total_strandings) * 100
+    print('Total percentage of strandings in ' + beach + ' is {:.2f}'.format(per_beach))
+print("----------------------------------------------")
+strandings_percent('GRAVEL')
+strandings_percent('SAND')
+strandings_percent('BOULDERS/LOOSE ROCK')
+strandings_percent('MADE GROUND (MAN MADE)')
+strandings_percent('MUD')
+strandings_percent('MUD & GRAVEL')
+strandings_percent('NOT PRESENT')
+strandings_percent('ROCK PLATFORM')
+strandings_percent('ROCK PLATFORM WITH BANKS OF GRAVEL')
+substrate_percent('ROCK PLATFORM WITH BOULDERS /LOSE ROCK')
+strandings_percent('SAND & GRAVEL')
+strandings_percent('SAND & MUD')
+strandings_percent('UNSPECIFIED')
+
+#From this we can see that sand makes up 45.88 percent of marine mammal strandings, but only 13.13% of total beach type
